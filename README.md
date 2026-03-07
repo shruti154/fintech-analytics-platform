@@ -13,6 +13,7 @@ with data quality tests and business-ready analytics tables.
 | Python + Faker | Synthetic data generation |
 | DuckDB | Local OLAP engine (no server required) |
 | dbt | Data transformation, testing, and documentation |
+| Streamlit + Plotly | Interactive analytics dashboard |
 
 ---
 
@@ -117,7 +118,7 @@ Notable: the `relationships` test on `stg_transactions.customer_id` verifies tha
 
 ## Setup
 
-**Prerequisites:** Python 3.9+, pip, dbt-duckdb
+**Prerequisites:** Python 3.9+, pip, dbt-duckdb, streamlit
 
 ```bash
 # 1. Clone the repository
@@ -125,12 +126,9 @@ git clone https://github.com/shruti154/fintech-analytics-platform.git
 cd fintech-analytics-platform
 
 # 2. Install Python dependencies
-pip install pandas numpy faker
+pip install pandas numpy faker dbt-duckdb streamlit plotly
 
-# 3. Install dbt
-pip install dbt-duckdb
-
-# 4. Configure dbt profile
+# 3. Configure dbt profile
 #    Create ~/.dbt/profiles.yml with:
 
 fintech_analytics:
@@ -141,18 +139,24 @@ fintech_analytics:
       threads: 1
   target: dev
 
-# 5. Generate synthetic data
+# 4. Generate synthetic data
 cd scripts
 python generate_data.py
 cd ..
 
-# 6. Run the pipeline
+# 5. Run the pipeline
 cd fintech_analytics
 dbt run
 
-# 7. Run data quality tests
+# 6. Run data quality tests
 dbt test
+
+# 7. Launch the dashboard
+cd ../dashboard
+streamlit run app.py
 ```
+
+The dashboard runs at **http://localhost:8501** and reads directly from `fintech.duckdb` — no export step needed.
 
 ---
 
@@ -181,6 +185,8 @@ fintech-analytics-platform/
 │   │       ├── mart_monthly_trends.sql
 │   │       └── mart_fraud_analysis.sql
 │   └── dbt_project.yml
+├── dashboard/
+│   └── app.py                  # Streamlit dashboard
 └── scripts/
     └── generate_data.py
 ```
