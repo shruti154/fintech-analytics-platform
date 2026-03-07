@@ -1,0 +1,111 @@
+version: 2
+
+models:
+  - name: stg_transactions
+    description: >
+      Cleaned and typed transaction records. Failed transactions are excluded.
+      One row per transaction event.
+    columns:
+      - name: transaction_id
+        description: Unique identifier for each transaction
+        tests:
+          - unique
+          - not_null
+
+      - name: customer_id
+        description: Foreign key to stg_customers
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
+
+      - name: transaction_date
+        description: Date the transaction occurred (cast from raw string)
+        tests:
+          - not_null
+
+      - name: amount
+        description: Transaction amount in GBP — always positive
+        tests:
+          - not_null
+
+      - name: merchant_category
+        description: Spending category, lowercased
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - groceries
+                  - eating_out
+                  - transport
+                  - entertainment
+                  - shopping
+                  - travel
+                  - utilities
+                  - healthcare
+                  - subscriptions
+                  - cash_withdrawal
+
+      - name: is_fraud
+        description: Boolean fraud flag — never null
+        tests:
+          - not_null
+
+      - name: status
+        description: >
+          Transaction status after staging filter. Only completed and pending
+          survive (failed rows are excluded in the WHERE clause).
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - completed
+                  - pending
+
+  - name: stg_customers
+    description: >
+      Cleaned customer profiles. One row per customer.
+    columns:
+      - name: customer_id
+        description: Unique customer identifier
+        tests:
+          - unique
+          - not_null
+
+      - name: email
+        description: Customer email, lowercased
+        tests:
+          - unique:
+              config:
+                severity: warn   # Faker reuses email patterns across 10k customers
+          - not_null
+
+      - name: account_type
+        description: Account tier — current, savings, or premium
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - current
+                  - savings
+                  - premium
+
+      - name: signup_date
+        description: Date the customer opened their account
+        tests:
+          - not_null
+
+      - name: credit_score
+        description: Credit score between 300 and 850
+        tests:
+          - not_null
+
+      - name: is_active
+        description: Whether the account is currently active
+        tests:
+          - not_null

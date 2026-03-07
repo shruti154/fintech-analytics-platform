@@ -1,0 +1,132 @@
+version: 2
+
+models:
+  - name: mart_category_analysis
+    description: >
+      Spend and fraud metrics aggregated by merchant category.
+      One row per category. Orders by total spend descending.
+    columns:
+      - name: merchant_category
+        description: Spending category — primary key of this model
+        tests:
+          - unique
+          - not_null
+      - name: total_transactions
+        description: Count of transactions in this category
+        tests:
+          - not_null
+      - name: total_spend
+        description: Sum of transaction amounts in GBP
+        tests:
+          - not_null
+      - name: fraud_rate_pct
+        description: Percentage of transactions that are fraudulent
+        tests:
+          - not_null
+
+  - name: mart_customer_segments
+    description: >
+      Per-customer spending profiles with RFM-style metrics and a value segment
+      label. One row per customer. Only customers who have made at least one
+      transaction appear here.
+    columns:
+      - name: customer_id
+        description: Customer identifier — primary key of this model
+        tests:
+          - unique
+          - not_null
+      - name: account_type
+        description: Customer account tier
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - current
+                  - savings
+                  - premium
+      - name: customer_segment
+        description: Value tier assigned by spend decile ranking
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - high_value
+                  - mid_value
+                  - low_value
+      - name: credit_band
+        description: Credit quality bucket derived from credit score
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - excellent
+                  - good
+                  - fair
+                  - poor
+      - name: total_transactions
+        description: Lifetime transaction count for this customer
+        tests:
+          - not_null
+      - name: total_spend
+        description: Lifetime spend in GBP
+        tests:
+          - not_null
+
+  - name: mart_monthly_trends
+    description: >
+      Monthly aggregated transaction metrics with month-over-month growth rates
+      and cumulative running totals. One row per calendar month (YYYY-MM).
+    columns:
+      - name: year_month
+        description: Calendar month in YYYY-MM format — primary key of this model
+        tests:
+          - unique
+          - not_null
+      - name: total_transactions
+        description: Transactions recorded in this month
+        tests:
+          - not_null
+      - name: total_spend
+        description: Total GBP spend in this month
+        tests:
+          - not_null
+      - name: fraud_rate_pct
+        description: Percentage of transactions flagged as fraud this month
+        tests:
+          - not_null
+      - name: cumulative_spend
+        description: Running total of spend from the first month through this month
+        tests:
+          - not_null
+
+  - name: mart_fraud_analysis
+    description: >
+      Fraud breakdown by account type × merchant category. Shows total fraud
+      transactions, fraud amounts, and fraud rates for every combination.
+      One row per account_type / merchant_category pair.
+    columns:
+      - name: account_type
+        description: Customer account tier
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - current
+                  - savings
+                  - premium
+      - name: merchant_category
+        description: Spending category
+        tests:
+          - not_null
+      - name: total_transactions
+        description: All transactions for this account_type × category combination
+        tests:
+          - not_null
+      - name: fraud_rate_pct
+        description: Fraud rate as a percentage within this segment × category
+        tests:
+          - not_null

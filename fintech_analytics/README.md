@@ -1,15 +1,13 @@
-Welcome to your new dbt project!
+# fintech_analytics — dbt project
 
-### Using the starter project
+This is the dbt project for the Fintech Analytics Platform.
+See the [project README](../README.md) for full documentation, setup instructions,
+and the data architecture overview.
 
-Try running the following commands:
-- dbt run
-- dbt test
+## Quick start
 
-
-### Resources:
-- Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
-- Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
-- Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
-- Find [dbt events](https://events.getdbt.com) near you
-- Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
+```bash
+dbt run    # build all models
+dbt test   # run 39 data quality tests
+dbt docs generate && dbt docs serve   # browse interactive documentation
+```

@@ -1,0 +1,57 @@
+version: 2
+
+models:
+  - name: int_customer_transactions
+    description: >
+      Enriched transaction records joined with customer profiles.
+      One row per transaction. The single join point for all mart models —
+      no aggregation, just enrichment.
+    columns:
+      - name: transaction_id
+        description: Unique transaction identifier — primary key of this model
+        tests:
+          - unique
+          - not_null
+
+      - name: customer_id
+        description: Customer who made the transaction
+        tests:
+          - not_null
+
+      - name: amount
+        description: Transaction amount in GBP
+        tests:
+          - not_null
+
+      - name: is_fraud
+        description: Boolean fraud flag
+        tests:
+          - not_null
+
+      - name: account_type
+        description: Customer account tier inherited from stg_customers
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - current
+                  - savings
+                  - premium
+
+      - name: credit_band
+        description: Derived credit quality bucket based on credit_score
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - excellent
+                  - good
+                  - fair
+                  - poor
+
+      - name: days_since_signup
+        description: Days between customer signup and transaction date
+        tests:
+          - not_null
